@@ -20,7 +20,7 @@ const TabNavigator = () => {
         options={{title: 'Mekanlar'}}
       />
       <Tab.Screen
-        name="Account"
+        name="AccountInfo"
         component={AuthStackNavigator}
         options={{title: 'Hesabım'}}
       />
