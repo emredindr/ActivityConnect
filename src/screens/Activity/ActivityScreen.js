@@ -1,5 +1,4 @@
-import {StyleSheet, Text, View,Button} from 'react-native';
-import React from 'react';
+import {StyleSheet, Text, View, Button} from 'react-native';
 
 const ActivityScreen = ({navigation}) => {
   const goToActivityDetail = () => {
@@ -7,7 +6,7 @@ const ActivityScreen = ({navigation}) => {
   };
   return (
     <View>
-      <Text>ActivityScreen</Text>
+      <Text style={{fontSize: 20}}>ActivityScreen </Text>
       <Button title="Go to Activity Detail" onPress={goToActivityDetail} />
     </View>
   );

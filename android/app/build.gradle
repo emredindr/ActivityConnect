@@ -55,6 +55,9 @@ react {
  */
 def enableProguardInReleaseBuilds = false
 
+//react-native-config
+apply from: project(":react-native-config").projectDir.getPath() + "/dotenv.gradle"
+
 //Vector Icons
 project.ext.vectoricons = [
     iconFontNames: [ 'MaterialCommunityIcons.ttf','MaterialIcons.ttf', 'EvilIcons.ttf','FontAwesome.ttf', ] // Name of the font files you want to copy
