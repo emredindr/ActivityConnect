@@ -1,10 +1,19 @@
 import {StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AccountScreen = () => {
+  const [userInfo, setUserInfo] = useState({});
+
+  useEffect(() => {
+    AsyncStorage.getItem('@USER').then(userSession => {
+      userSession && setUserInfo(JSON.parse(userSession));
+    });
+  }, []);
+
   return (
     <View>
-      <Text>AccountScreen</Text>
+      <Text>{userInfo.name}</Text>
     </View>
   );
 };

@@ -3,41 +3,60 @@ import AccountScreen from '../screens/Account/AccountScreen';
 import LoginScreen from '../screens/Login/LoginScreen';
 import RegisterScreen from '../screens/Register/RegisterScreen';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import React, {useContext, useEffect, useState} from 'react';
+import {Context as AuthContext} from '../context/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Pressable} from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
 const AuthNavigator = () => {
-  const isAuthenticated = true;
+  const {state, signout} = useContext(AuthContext);
+  const [user, setUser] = useState();
+
+  const checkUserSession = async () => {
+    const userSession = JSON.parse(await AsyncStorage.getItem('@USER'));
+    if (userSession) {
+      setUser(userSession);
+    } else {
+      setUser(null);
+    }
+  };
+  useEffect(() => {
+    checkUserSession();
+  }, [state]);
 
   return (
-    <>
-      {isAuthenticated ? (
-        <Stack.Navigator initialRouteName="Account">
-          <Stack.Screen
-            name="Account"
-            component={AccountScreen}
-            options={{
-              headerTitleAlign: 'center',
-              headerTitle: 'Hesabım',
-              headerRight: () => <Icon name="logout" size={30} style={{color:'red'}}></Icon>,
-            }}
-          />
-        </Stack.Navigator>
+    <Stack.Navigator>
+      {user != null ? (
+        <Stack.Screen
+          name="Account"
+          component={AccountScreen}
+          options={{
+            headerTitleAlign: 'center',
+            headerTitle: 'Hesabım',
+            headerRight: () => (
+              <Pressable onPress={signout}>
+                <Icon name="logout" size={30} color="#900" />
+              </Pressable>
+            ),
+          }}
+        />
       ) : (
-        <Stack.Navigator initialRouteName="Login">
+        <>
           <Stack.Screen
             name="Login"
             component={LoginScreen}
-            options={{headerTitleAlign: 'center'}}
+            options={{headerTitleAlign: 'center', headerTitle: 'Giriş Yap'}}
           />
           <Stack.Screen
             name="Register"
             component={RegisterScreen}
-            options={{headerTitleAlign: 'center'}}
+            options={{headerTitleAlign: 'center', headerTitle: 'Üye Ol'}}
           />
-        </Stack.Navigator>
+        </>
       )}
-    </>
+    </Stack.Navigator>
   );
 };
 

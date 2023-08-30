@@ -1,38 +1,45 @@
 import createDataContext from './createDataContext';
+import Config from 'react-native-config';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const authReducer = (state, action) => {
   switch (action.type) {
-    // case 'add_user':
-    //   return [...state, action.payload];
+    case 'signin':
+      return {user: action.payload};
+    case 'signout':
+      return {user: null};
     default:
       return state;
   }
 };
 
 const signup = dispacth => {
-  return ({email, password}) => {
-    // make api request to sign up with that email and password
-    // if we sign up, modify our state, and say that we are authenticated
-    // if signing up fails, we probably need to reflect an error message somewhere
-  };
+  return ({email, password}) => {};
 };
 
-const signin = dispacth => {
-  return ({email, password}) => {
-    // try to signin
-    // handle success by updating state
-    // handle failure by showing error message (somehow)
+const signin =
+  dispacth =>
+  async ({email, password}) => {
+    try {
+      const response = await axios.post(Config.API_Local_URL + '/Auth/Login', {
+        email,
+        password,
+      });
+      await AsyncStorage.setItem('@USER', JSON.stringify(response.data.result));
+      dispacth({type: 'signin', payload: response.data.result});
+    } catch (error) {
+      console.log(error.message);
+    }
   };
-};
 
-const signout = dispacth => {
-  return () => {
-    // somehow sign out!!!
-  };
+const signout = dispacth => async () => {
+  await AsyncStorage.removeItem('@USER');
+  dispacth({type: 'signout'});
 };
 
 export const {Context, Provider} = createDataContext(
   authReducer,
   {signin, signout, signup},
-  {isSignedIn: false},
+  {user: null},
 );
