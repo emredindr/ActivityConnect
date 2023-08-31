@@ -1,7 +1,6 @@
-import React from 'react';
 import {apiGet} from '../api/API';
 
-class ActivityService {
+class ActivitiesService {
   async getGetAll(searchText, venueId, activityTypeId) {
     return await apiGet('Activity/GetActivityList', {
       searchText,
@@ -10,4 +9,4 @@ class ActivityService {
     },);
   }
 }
-export default new ActivityService();
+export default new ActivitiesService();

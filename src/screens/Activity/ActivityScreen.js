@@ -1,12 +1,12 @@
 import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, View, Button, FlatList} from 'react-native';
-import activityService from '../../services/ActivityService';
+import activitiesService from '../../services/ActivitiesService';
 
 const ActivityScreen = ({navigation}) => {
   const [activities, setActivities] = useState([]);
 
   const getActivities = async () => {
-    await activityService.getGetAll().then(res => {
+    await activitiesService.getGetAll().then(res => {
       if (res.IsError) return;
 
       setActivities(res.result.data);
