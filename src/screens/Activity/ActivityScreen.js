@@ -1,19 +1,20 @@
 import React, {useState, useEffect} from 'react';
-import axios from 'axios';
 import {StyleSheet, Text, View, Button, FlatList} from 'react-native';
-import {getActivities} from '../../api/ActivityAPI';
-import { Avatar } from 'react-native-paper';
+import activityService from '../../services/ActivityService';
 
 const ActivityScreen = ({navigation}) => {
   const [activities, setActivities] = useState([]);
 
-  const fetchActivities = async () => {
-    const data = await getActivities();
-    setActivities(data);
+  const getActivities = async () => {
+    await activityService.getGetAll().then(res => {
+      if (res.IsError) return;
+
+      setActivities(res.result.data);
+    });
   };
 
   useEffect(() => {
-    fetchActivities();
+    getActivities();
   }, []);
 
   const goToActivityDetail = () => {
