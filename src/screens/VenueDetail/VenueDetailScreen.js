@@ -6,7 +6,6 @@ import {Button} from 'react-native-paper';
 
 const VenueDetailScreen = ({route, navigation}) => {
   const [venue] = useState(route.params.venue);
-  // const {venue} = route.params;
   const width = Dimensions.get('window').width;
 
   const coords = {

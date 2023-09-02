@@ -8,25 +8,22 @@ import {
   TouchableOpacity,
   Pressable,
   Platform,
+  Dimensions,
+  Image,
 } from 'react-native';
 import activityService from '../../services/ActivityService';
 import {Searchbar} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Dropdown} from 'react-native-element-dropdown';
-import {Button} from 'react-native-paper';
 import venueService from '../../services/VenueService';
 import activityTypeService from '../../services/ActivityTypeService';
 import cityService from '../../services/CityService';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import {blue} from 'react-native-reanimated';
+import Carousel from 'react-native-reanimated-carousel';
+import {Button, Card} from 'react-native-paper';
 
 const ActivityScreen = ({navigation}) => {
-  const [activities, setActivities] = useState([
-    {name: 'Etkinlik 1'},
-    {name: 'Etkinlik 2'},
-    {name: 'Etkinlik 3'},
-    {name: 'Etkinlik 4'},
-  ]);
+  const [activities, setActivities] = useState([]);
   const [cityId, setCityId] = useState(null);
   const [venueId, setVenueId] = useState(null);
   const [activityTypeId, setActivityTypeId] = useState(null);
@@ -41,10 +38,11 @@ const ActivityScreen = ({navigation}) => {
   const [isStartDatePickerVisible, setStartDatePickerVisibility] =
     useState(false);
 
+  const width = Dimensions.get('window').width;
+
   const getActivities = async () => {
     await activityService.getAll().then(res => {
       if (res.IsError) return;
-
       setActivities(res.result.data);
     });
   };
@@ -125,28 +123,34 @@ const ActivityScreen = ({navigation}) => {
   useEffect(() => {
     getActivityTypes();
     getCities();
+    getActivities();
   }, []);
 
   return (
     <View style={{flex: 1}}>
       <View
         style={{
-          backgroundColor: '#fff',
+          backgroundColor: '#00B9E8',
           padding: 10,
           margin: 10,
           borderRadius: 10,
           flexDirection: 'row',
         }}>
         <Searchbar
-          style={{flex: 1}}
-          placeholder="Search"
+          style={{flex: 1, backgroundColor: 'white'}}
+          placeholder="Ara...."
           onChangeText={text => setSearchText(text)}
           value={searchText}
+          color="#00B9E8"
+          placeholderTextColor="#00B9E8"
+          iconColor="#00B9E8"
+          cursorColor="#00B9E8"
+          autoCapitalize="none"
         />
         <Icon
           name="filter-plus-outline"
           size={30}
-          color="gray"
+          color="white"
           style={{alignSelf: 'center', marginLeft: 10}}
           onPress={() => setFilterVisible(!filterVisible)}
         />
@@ -219,7 +223,7 @@ const ActivityScreen = ({navigation}) => {
             backgroundColor: 'white',
             borderRadius: 12,
             borderWidth: 1,
-            borderColor: 'gray',
+            borderColor: '#00B9E8',
             shadowColor: '#000',
             shadowOffset: {
               width: 0,
@@ -236,9 +240,12 @@ const ActivityScreen = ({navigation}) => {
               style={{
                 textAlign: 'center',
                 fontSize: 16,
+                color: '#00B9E8',
+                placeholderTextColor: '#00B9E8',
               }}
               value={getStartDate()}
               placeholder="Başlangıç Tarihi"
+              placeholderTextColor="#00B9E8"
               editable={false}
             />
           </TouchableOpacity>
@@ -255,9 +262,11 @@ const ActivityScreen = ({navigation}) => {
               style={{
                 textAlign: 'center',
                 fontSize: 16,
+                color: '#00B9E8',
               }}
               value={getEndDate()}
               placeholder="Bitiş Tarihi"
+              placeholderTextColor="#00B9E8"
               editable={false}
             />
           </TouchableOpacity>
@@ -274,13 +283,14 @@ const ActivityScreen = ({navigation}) => {
         <View
           style={{
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            margin: 12,
           }}>
           <Button
             mode="outlined"
             onPress={() => clearInput()}
-            style={{flex: 1, margin: 5, borderWidth: 1}}>
-            Temizle
+            style={{flex: 1, borderWidth: 1, borderColor: '#00B9E8', margin: 2}}
+            textColor="#00B9E8">
+            Sıfırla
           </Button>
           <Button
             mode="outlined"
@@ -296,30 +306,110 @@ const ActivityScreen = ({navigation}) => {
                 'EndDate: ' + getE(),
               )
             }
-            style={{flex: 1, margin: 5}}>
+            style={{flex: 1, borderWidth: 1, borderColor: '#00B9E8', margin: 2}}
+            textColor="#00B9E8">
             Filtrele
           </Button>
         </View>
       </View>
 
-      <View />
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        <Text style={{margin: 10, fontSize: 20}}>Etkinlikler</Text>
-        <Text style={{margin: 10, fontSize: 20}}>Tümünü Gör</Text>
-      </View>
       <FlatList
         data={activities}
         renderItem={({item, index}) => (
-          <Text
-            key={index}
-            style={{
-              padding: 10,
-              margin: 10,
-              borderRadius: 10,
-              backgroundColor: 'blue',
-            }}>
-            {item.name}
-          </Text>
+          <Pressable
+            onPress={() =>
+              navigation.navigate('ActivityDetailScreen', {
+                activity: item,
+              })
+            }>
+            <Card
+              style={{
+                margin: 10,
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: '#00B9E8',
+                backgroundColor: '#fff',
+              }}>
+              <Card.Title
+                title={item.name}
+                subtitle={
+                  <>
+                    <Icon name="map-marker" size={14} color="#00B9E8" />
+                    <Text style={{fontSize: 14, color: 'black'}}>
+                      {item.venue.name}
+                    </Text>
+                  </>
+                }
+                titleStyle={{
+                  fontSize: 18,
+                  color: '#00B9E8',
+                  textAlign: 'center',
+                }}
+              />
+              <Card.Content>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    marginBottom: 3,
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}>
+                    <Icon name="clock" size={12} color="#00B9E8" />
+                    <Text style={{fontSize: 14, color: 'black'}}>
+                      {new Date(item.startDate).toLocaleDateString('tr-Tr') +
+                        ' - ' +
+                        new Date(item.startDate).toLocaleTimeString('tr-TR')}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}>
+                    <Icon name="currency-usd" size={14} color="#00B9E8" />
+                    <Text style={{fontSize: 14, color: 'black'}}>
+                      {item.ticketPrice == 0
+                        ? 'ÜCRETSİZ'
+                        : `${item.price} + TL`}
+                    </Text>
+                  </View>
+                </View>
+              </Card.Content>
+              <Card.Cover
+                source={{
+                  uri:
+                    item.images[0].url !== null
+                      ? item.images[0].url
+                      : 'https://t4.ftcdn.net/jpg/03/15/18/09/240_F_315180932_rhiXFrJN27zXCCdrgx8V5GWbLd9zTHHA.jpg',
+                }}
+                style={{
+                  height: 200,
+                  resizeMode: 'contain',
+                  zIndex: -1,
+                }}
+              />
+              <Text
+                style={{
+                  backgroundColor: 'white',
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
+                  fontSize: 16,
+                  color: '#00B9E8',
+                  borderWidth: 1,
+                  borderColor: '#00B9E8',
+                  padding: 5,
+                  borderTopLeftRadius: 10,
+                  borderBottomRightRadius: 10,
+                }}>
+                Detaylı Bilgi
+              </Text>
+            </Card>
+          </Pressable>
         )}
       />
     </View>
@@ -336,17 +426,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'gray',
+    color: '#00B9E8',
+    borderColor: '#00B9E8',
     padding: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-
-    elevation: 2,
   },
   dropdownVenues: {
     margin: 16,
@@ -354,27 +436,21 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'gray',
+    borderColor: '#00B9E8',
     padding: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-
-    elevation: 2,
   },
   placeholderStyle: {
     fontSize: 16,
+    color: '#00B9E8',
   },
   selectedTextStyle: {
     fontSize: 16,
+    color: '#00B9E8',
   },
   iconStyle: {
     width: 20,
     height: 20,
+    tintColor: '#00B9E8',
   },
   inputSearchStyle: {
     height: 40,
