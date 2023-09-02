@@ -22,7 +22,7 @@ const signin =
   dispacth =>
   async ({email, password}) => {
     try {
-      const response = await axios.post(Config.API_Local_URL + '/Auth/Login', {
+      const response = await axios.post(Config.API_Local_URL + 'Auth/Login', {
         email,
         password,
       });

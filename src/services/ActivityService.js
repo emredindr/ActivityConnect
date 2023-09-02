@@ -1,7 +1,7 @@
 import {apiGet} from '../api/API';
 
-class ActivitiesService {
-  async getGetAll(searchText, venueId, activityTypeId) {
+class ActivityService {
+  async getAll(searchText, venueId, activityTypeId) {
     return await apiGet('Activity/GetActivityList', {
       searchText,
       venueId,
@@ -9,4 +9,4 @@ class ActivitiesService {
     },);
   }
 }
-export default new ActivitiesService();
+export default new ActivityService();
