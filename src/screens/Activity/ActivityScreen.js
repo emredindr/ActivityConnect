@@ -1,15 +1,12 @@
-import React, {useState, useEffect} from 'react';
+import {useState, useEffect} from 'react';
 import {
-  StyleSheet,
   Text,
   View,
   FlatList,
   TextInput,
   TouchableOpacity,
-  Pressable,
-  Platform,
   Dimensions,
-  Image,
+  ScrollView,
 } from 'react-native';
 import activityService from '../../services/ActivityService';
 import {Searchbar} from 'react-native-paper';
@@ -21,6 +18,7 @@ import cityService from '../../services/CityService';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Carousel from 'react-native-reanimated-carousel';
 import {Button, Card} from 'react-native-paper';
+import styles from './ActivityScreeen.Style';
 
 const ActivityScreen = ({navigation}) => {
   const [activities, setActivities] = useState([]);
@@ -28,7 +26,7 @@ const ActivityScreen = ({navigation}) => {
   const [venueId, setVenueId] = useState(null);
   const [activityTypeId, setActivityTypeId] = useState(null);
   const [searchText, setSearchText] = useState('');
-  const [filterVisible, setFilterVisible] = useState(false);
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [venues, setVenues] = useState([]);
   const [activityTypes, setActivityTypes] = useState([]);
   const [cities, setCities] = useState([]);
@@ -112,6 +110,24 @@ const ActivityScreen = ({navigation}) => {
     });
   };
 
+  const handleOnPressFilter = async (
+    activityTypeId,
+    cityId,
+    venueId,
+    startDate,
+    endDate,
+  ) => {
+    console.log(activityTypeId, cityId, venueId, startDate, endDate);
+    setIsFilterVisible(false);
+  };
+
+  const renderImageData = images => {
+    const image = images.find(x => x.isDefault === true);
+    return image
+      ? image.url
+      : 'https://t4.ftcdn.net/jpg/03/15/18/09/240_F_315180932_rhiXFrJN27zXCCdrgx8V5GWbLd9zTHHA.jpg';
+  };
+
   const clearInput = () => {
     setActivityTypeId(null);
     setCityId(null);
@@ -127,7 +143,7 @@ const ActivityScreen = ({navigation}) => {
   }, []);
 
   return (
-    <View style={{flex: 1}}>
+    <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
       <View
         style={{
           backgroundColor: '#00B9E8',
@@ -152,13 +168,13 @@ const ActivityScreen = ({navigation}) => {
           size={30}
           color="white"
           style={{alignSelf: 'center', marginLeft: 10}}
-          onPress={() => setFilterVisible(!filterVisible)}
+          onPress={() => setIsFilterVisible(!isFilterVisible)}
         />
       </View>
       <View
         style={{
           backgroundColor: '#fff',
-          display: filterVisible ? 'flex' : 'none',
+          display: isFilterVisible ? 'flex' : 'none',
         }}>
         <View style={{flexDirection: 'row'}}>
           <Dropdown
@@ -224,14 +240,6 @@ const ActivityScreen = ({navigation}) => {
             borderRadius: 12,
             borderWidth: 1,
             borderColor: '#00B9E8',
-            shadowColor: '#000',
-            shadowOffset: {
-              width: 0,
-              height: 1,
-            },
-            shadowOpacity: 0.2,
-            shadowRadius: 1.41,
-            elevation: 2,
             flexDirection: 'row',
             justifyContent: 'space-evenly',
           }}>
@@ -241,7 +249,6 @@ const ActivityScreen = ({navigation}) => {
                 textAlign: 'center',
                 fontSize: 16,
                 color: '#00B9E8',
-                placeholderTextColor: '#00B9E8',
               }}
               value={getStartDate()}
               placeholder="Başlangıç Tarihi"
@@ -295,15 +302,12 @@ const ActivityScreen = ({navigation}) => {
           <Button
             mode="outlined"
             onPress={() =>
-              console.log(
-                'VenueId: ' +
-                  venueId +
-                  ' CityId: ' +
-                  cityId +
-                  ' ActivityTypeId: ' +
-                  activityTypeId,
-                'StartDate: ' + getStartDate(),
-                'EndDate: ' + getE(),
+              handleOnPressFilter(
+                activityTypeId,
+                cityId,
+                venueId,
+                startDate,
+                endDate,
               )
             }
             style={{flex: 1, borderWidth: 1, borderColor: '#00B9E8', margin: 2}}
@@ -312,15 +316,69 @@ const ActivityScreen = ({navigation}) => {
           </Button>
         </View>
       </View>
+      <Carousel
+        loop
+        width={width}
+        height={width / 1.5}
+        autoPlay={true}
+        data={activities.filter(x => x.isFavorite == true)}
+        scrollAnimationDuration={3000}
+        renderItem={({index}) => (
+          <Card
+            style={{
+              flex: 1,
+              backgroundColor: 'white',
+              borderRadius: 5,
+              shadowColor: '#000',
+              shadowOpacity: 0.25,
+              elevation: 5,
+              margin: 10,
+            }}>
+            <Card.Title
+              left={() => <Icon name="star" size={30} color="#FFBF00" />}
+              title={activities[index].name}
+              titleStyle={{
+                fontSize: 18,
+                color: '#00B9E8',
+              }}
+            />
+
+            <Card.Cover
+              style={{}}
+              source={{
+                uri: renderImageData(activities[index].images),
+              }}
+              resizeMode="stretch"
+            />
+          </Card>
+        )}
+      />
+      <View
+        style={{
+          alignItems: 'center',
+          backgroundColor: '#fff',
+          marginTop: 15,
+          margin: 10,
+        }}>
+        <Text
+          style={{
+            fontSize: 18,
+            color: '#00B9E8',
+            textAlign: 'left',
+            fontWeight: 'bold',
+            margin: 10,
+          }}>
+          Tüm Etkinlikler
+        </Text>
+      </View>
 
       <FlatList
         data={activities}
-        renderItem={({item, index}) => (
-          <Pressable
+        scrollEnabled={false}
+        renderItem={({item}) => (
+          <TouchableOpacity
             onPress={() =>
-              navigation.navigate('ActivityDetailScreen', {
-                activity: item,
-              })
+              navigation.navigate('ActivityDetail', {activity: item})
             }>
             <Card
               style={{
@@ -381,17 +439,15 @@ const ActivityScreen = ({navigation}) => {
               </Card.Content>
               <Card.Cover
                 source={{
-                  uri:
-                    item.images[0].url !== null
-                      ? item.images[0].url
-                      : 'https://t4.ftcdn.net/jpg/03/15/18/09/240_F_315180932_rhiXFrJN27zXCCdrgx8V5GWbLd9zTHHA.jpg',
+                  uri: renderImageData(item.images),
                 }}
                 style={{
-                  height: 200,
-                  resizeMode: 'contain',
+                  height: 400,
                   zIndex: -1,
                 }}
+                resizeMode="contain"
               />
+
               <Text
                 style={{
                   backgroundColor: 'white',
@@ -409,51 +465,21 @@ const ActivityScreen = ({navigation}) => {
                 Detaylı Bilgi
               </Text>
             </Card>
-          </Pressable>
+          </TouchableOpacity>
         )}
       />
-    </View>
+      <Text
+        style={{
+          backgroundColor: '#fff',
+          textAlign: 'center',
+          color: '#00B9E8',
+          fontSize: 16,
+          margin: 10,
+        }}>
+        Toplam {activities.length} etkinlik bulundu.
+      </Text>
+    </ScrollView>
   );
 };
 
 export default ActivityScreen;
-
-const styles = StyleSheet.create({
-  dropdown: {
-    flex: 1,
-    margin: 16,
-    height: 50,
-    backgroundColor: 'white',
-    borderRadius: 12,
-    borderWidth: 1,
-    color: '#00B9E8',
-    borderColor: '#00B9E8',
-    padding: 12,
-  },
-  dropdownVenues: {
-    margin: 16,
-    height: 50,
-    backgroundColor: 'white',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#00B9E8',
-    padding: 12,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-    color: '#00B9E8',
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-    color: '#00B9E8',
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-    tintColor: '#00B9E8',
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
-});

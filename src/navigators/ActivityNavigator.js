@@ -1,6 +1,7 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import ActivityDetailScreen from '../screens/ActivityDetail/ActivityDetailScreen';
 import ActivityScreen from '../screens/Activity/ActivityScreen';
+import VenueActivityScreen from '../screens/VenueActivity/VenueActivityScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -12,11 +13,8 @@ const ActivityStackNavigator = () => {
         component={ActivityScreen}
         options={{headerShown: false}}
       />
-      <Stack.Screen
-        name="ActivityDetail"
-        component={ActivityDetailScreen}
-        options={{headerTitle: 'Etkinlik Detayları'}}
-      />
+      <Stack.Screen name="ActivityDetail" component={ActivityDetailScreen} />
+      <Stack.Screen name="VenueActivity" component={VenueActivityScreen} />
     </Stack.Navigator>
   );
 };
