@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useCallback} from 'react';
 import {
   Text,
   View,
@@ -7,18 +7,19 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import activityService from '../../services/ActivityService';
 import {Searchbar} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Dropdown} from 'react-native-element-dropdown';
 import venueService from '../../services/VenueService';
 import activityTypeService from '../../services/ActivityTypeService';
 import cityService from '../../services/CityService';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Carousel from 'react-native-reanimated-carousel';
 import {Button, Card} from 'react-native-paper';
-import styles from './ActivityScreeen.Style';
+import Loading from '../../components/Loading/Loading';
+import CustomDropdown from '../../components/Dropdown/Dropdown';
 
 const ActivityScreen = ({navigation}) => {
   const [activities, setActivities] = useState([]);
@@ -35,6 +36,7 @@ const ActivityScreen = ({navigation}) => {
   const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
   const [isStartDatePickerVisible, setStartDatePickerVisibility] =
     useState(false);
+  const [loading, setLoading] = useState(true);
 
   const width = Dimensions.get('window').width;
 
@@ -43,6 +45,7 @@ const ActivityScreen = ({navigation}) => {
       if (res.IsError) return;
       setActivities(res.result.data);
     });
+    setLoading(false);
   };
 
   const showOrHideStartDatePicker = () => {
@@ -136,14 +139,28 @@ const ActivityScreen = ({navigation}) => {
     setStartDate('');
   };
 
+  const onRefresh = useCallback(async () => {
+    setLoading(true);
+    getActivityTypes();
+    getCities();
+    getActivities();
+  }, []);
+
   useEffect(() => {
     getActivityTypes();
     getCities();
     getActivities();
   }, []);
 
+  if (loading) return <Loading />;
+
   return (
-    <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={{flex: 1}}
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={loading} onRefresh={onRefresh} />
+      }>
       <View
         style={{
           backgroundColor: '#00B9E8',
@@ -177,61 +194,33 @@ const ActivityScreen = ({navigation}) => {
           display: isFilterVisible ? 'flex' : 'none',
         }}>
         <View style={{flexDirection: 'row'}}>
-          <Dropdown
+          <CustomDropdown
             data={activityTypes}
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            maxHeight={300}
             labelField="name"
             valueField="id"
             placeholder="Etkinlik Türü Seç"
             searchPlaceholder="Ara ..."
             value={activityTypeId}
-            search
             onChange={handleOnChangeActivityType}
-            // renderItem={renderCategoryTypeIt}
           />
-          <Dropdown
+          <CustomDropdown
             data={cities}
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            maxHeight={300}
             labelField="name"
             valueField="id"
             placeholder="İl Seçiniz "
-            searchPlaceholder="Ara ..."
             value={cityId}
-            search
             onChange={handleOnChangeCity}
-            // renderItem={renderCategoryTypeIt}
           />
         </View>
-        <View style={{}}>
-          <Dropdown
-            data={venues}
-            style={styles.dropdownVenues}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            maxHeight={300}
-            labelField="name"
-            valueField="id"
-            placeholder="Mekan Seçiniz "
-            searchPlaceholder="Ara ..."
-            value={venueId}
-            disable={cityId === null ? true : false}
-            search
-            onChange={handleOnChangeVenue}
-            // renderItem={renderCategoryTypeIt}
-          />
-        </View>
+        <CustomDropdown
+          data={venues}
+          labelField="name"
+          valueField="id"
+          placeholder="Mekan Seçiniz "
+          value={venueId}
+          disable={cityId === null ? true : false}
+          onChange={handleOnChangeVenue}
+        />
         <View
           style={{
             margin: 16,
@@ -316,6 +305,7 @@ const ActivityScreen = ({navigation}) => {
           </Button>
         </View>
       </View>
+
       <Carousel
         loop
         width={width}
@@ -329,9 +319,6 @@ const ActivityScreen = ({navigation}) => {
               flex: 1,
               backgroundColor: 'white',
               borderRadius: 5,
-              shadowColor: '#000',
-              shadowOpacity: 0.25,
-              elevation: 5,
               margin: 10,
             }}>
             <Card.Title

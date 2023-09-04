@@ -68,7 +68,7 @@ const DetailProperties = ({fieldKey, fieldValue, isPressable = false,onClick}) =
                 style={{
                   fontSize: 15,
                   fontWeight: '400',
-                  color: 'blue',
+                  color: '#00B9E8',
                   flex: 1,
                 }}
                 multiline={true}
@@ -82,7 +82,7 @@ const DetailProperties = ({fieldKey, fieldValue, isPressable = false,onClick}) =
                   fontWeight: '400',
                   textAlign: 'left',
                   padding: 10,
-                  color: 'blue',
+                  color: '#00B9E8',
                 }}>
                 {fieldValue}
               </Text>

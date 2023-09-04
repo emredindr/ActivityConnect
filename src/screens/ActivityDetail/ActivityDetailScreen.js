@@ -1,9 +1,17 @@
-import {StyleSheet, Text, View, ScrollView, Dimensions} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Dimensions,
+  TouchableOpacity,
+  Share,
+  Alert,
+} from 'react-native';
 import {useState, useEffect} from 'react';
 import React from 'react';
-import {Divider} from 'react-native-paper';
 import Carousel from 'react-native-reanimated-carousel';
-import {Button, Card} from 'react-native-paper';
+import {Card} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DetailProperties from '../../components/DetailProperies/DetailProperties';
 import Title from '../../components/Title/Title';
@@ -21,9 +29,38 @@ const ActivityDetailScreen = ({route, navigation}) => {
     longitudeDelta: 0.01,
   };
 
+  const handleOnPressShare = async () => {
+    try {
+      const result = await Share.share({
+        message: 'Bu güzel etkinliği kaçırmayın! ' + activity.name,
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  };
+
   useEffect(() => {
     navigation.setOptions({
       title: activity.name,
+      headerRight: () => (
+        <TouchableOpacity onPress={handleOnPressShare}>
+          <Icon
+            name="share-variant"
+            size={25}
+            color="#00B9E8"
+            style={{marginRight: 10}}
+          />
+        </TouchableOpacity>
+      ),
       headerTitleAlign: 'flex-start',
       headerTitleStyle: {
         fontSize: 15,
@@ -99,20 +136,22 @@ const ActivityDetailScreen = ({route, navigation}) => {
           <Text
             style={{
               fontSize: 20,
-              fontWeight: 'bold',
               textAlign: 'right',
               padding: 10,
               color: '#00B9E8',
               fontWeight: '600',
               borderRadius: 10,
-              backgroundColor: '#FFFDD0',
               margin: 10,
+              backgroundColor: '#E6F7FF',
             }}>
             {activity.activityType.name}
           </Text>
         </View>
+
         <Title title="KONUSU" />
+
         <DetailProperties fieldValue={activity.description} />
+
         <DetailProperties
           fieldKey="Tarih"
           fieldValue={
@@ -153,16 +192,19 @@ const ActivityDetailScreen = ({route, navigation}) => {
           fieldKey="Yazar"
           fieldValue={activity.authorInfo.author}
         />
+
         <DetailProperties
           fieldKey="Yönetmen"
           fieldValue={activity.authorInfo.directedBy}
         />
+
         <DetailProperties
           fieldKey="Çeviri"
           fieldValue={activity.authorInfo.translator}
         />
 
         <Title title="ETKİNLİK YERİ" />
+
         <DetailProperties
           isPressable={true}
           fieldKey="Mekan Adı"
@@ -171,18 +213,19 @@ const ActivityDetailScreen = ({route, navigation}) => {
             navigation.navigate('VenueActivity', {venue: activity.venue})
           }
         />
+
         <View>
           <MapView
             provider={PROVIDER_GOOGLE}
             initialRegion={coords}
             style={{
               width: '100%',
-
               height: 300,
             }}>
             <Marker coordinate={coords} />
           </MapView>
         </View>
+
         <DetailProperties
           fieldKey="Adres"
           fieldValue={`${activity.venue.address.openAddress} ${activity.venue.address.districtName} / ${activity.venue.address.cityName} `}
@@ -192,6 +235,33 @@ const ActivityDetailScreen = ({route, navigation}) => {
           fieldKey="İletişim Numarası"
           fieldValue={activity.venue.phoneNumber}
         />
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            justifyContent: 'center',
+          }}>
+          <TouchableOpacity
+            style={{
+              margin: 10,
+              backgroundColor: '#00B9E8',
+              borderRadius: 10,
+              width: 150,
+              height: 50,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            onPress={() => navigation.navigate('ActivityTicket', {activity})}>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                color: 'white',
+              }}>
+              Bilet Al
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
