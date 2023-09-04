@@ -235,33 +235,28 @@ const ActivityDetailScreen = ({route, navigation}) => {
           fieldKey="İletişim Numarası"
           fieldValue={activity.venue.phoneNumber}
         />
-        <View
+
+        <TouchableOpacity
           style={{
-            flex: 1,
-            flexDirection: 'row',
+            margin: 10,
+            backgroundColor: '#00B9E8',
+            height: 50,
+            borderRadius: 30,
+            alignItems: 'center',
             justifyContent: 'center',
-          }}>
-          <TouchableOpacity
+            marginBottom: 20,
+
+          }}
+          onPress={() => navigation.navigate('ActivityTicket', {activity})}>
+          <Text
             style={{
-              margin: 10,
-              backgroundColor: '#00B9E8',
-              borderRadius: 10,
-              width: 150,
-              height: 50,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-            onPress={() => navigation.navigate('ActivityTicket', {activity})}>
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: 'bold',
-                color: 'white',
-              }}>
-              Bilet Al
-            </Text>
-          </TouchableOpacity>
-        </View>
+              fontSize: 20,
+              fontWeight: 'bold',
+              color: 'white',
+            }}>
+            Bilet Al
+          </Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );

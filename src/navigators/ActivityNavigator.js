@@ -17,7 +17,13 @@ const ActivityStackNavigator = () => {
       <Stack.Screen name="ActivityDetail" component={ActivityDetailScreen} />
       <Stack.Screen name="VenueActivity" component={VenueActivityScreen} />
 
-      <Stack.Screen name="ActivityTicket" component={ActivityTicketScreen} />
+      <Stack.Screen
+        name="ActivityTicket"
+        options={{
+          title: 'Koltuk Seçimi',
+        }}
+        component={ActivityTicketScreen}
+      />
     </Stack.Navigator>
   );
 };
