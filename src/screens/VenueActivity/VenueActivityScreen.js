@@ -1,4 +1,4 @@
-import {View, Text, FlatList, TouchableOpacity} from 'react-native';
+import {View, Text, FlatList, TouchableOpacity, ScrollView} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import activityService from '../../services/ActivityService';
 import {Card} from 'react-native-paper';
@@ -39,7 +39,7 @@ const VenueActivityScreen = ({route, navigation}) => {
     getVenueActivities();
   }, []);
   return (
-    <View>
+    <ScrollView showsVerticalScrollIndicator={false}>
       <View
         style={{
           alignItems: 'center',
@@ -111,7 +111,7 @@ const VenueActivityScreen = ({route, navigation}) => {
                     <Text style={{fontSize: 14, color: 'black'}}>
                       {item.ticketPrice == 0
                         ? 'ÜCRETSİZ'
-                        : `${item.price} + TL`}
+                        : `${item.ticketPrice} + TL`}
                     </Text>
                   </View>
                 </View>
@@ -147,7 +147,7 @@ const VenueActivityScreen = ({route, navigation}) => {
           </TouchableOpacity>
         )}
       />
-    </View>
+    </ScrollView>
   );
 };
 

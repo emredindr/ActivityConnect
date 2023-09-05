@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   dropdown: {
     flex: 1,
     margin: 16,
-    height: 50,
+    height: 30,
     backgroundColor: 'white',
     borderRadius: 12,
     borderWidth: 1,
@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
   selectedTextStyle: {
     fontSize: 16,
     color: '#00B9E8',
+    textAlign: 'center',
   },
   iconStyle: {
     width: 20,

@@ -78,10 +78,18 @@ const ActivityDetailScreen = ({route, navigation}) => {
           loop
           defaultIndex={0}
           width={width}
-          height={width / 1.5}
+          height={width / 1.2}
           autoPlay={true}
           autoPlayInterval={5000}
-          data={activity.images.filter(x => x.isDefault == false)}
+          data={
+            activity.images.length > 0
+              ? activity.images
+              : [
+                  {
+                    url: 'https://t4.ftcdn.net/jpg/03/15/18/09/240_F_315180932_rhiXFrJN27zXCCdrgx8V5GWbLd9zTHHA.jpg',
+                  },
+                ]
+          }
           scrollAnimationDuration={3000}
           renderItem={({item}) => (
             <Card
@@ -115,7 +123,7 @@ const ActivityDetailScreen = ({route, navigation}) => {
               <Card.Cover
                 style={{
                   width: '100%',
-                  height: 210,
+                  height: width / 1.2,
                 }}
                 source={{
                   uri: item.url
@@ -245,7 +253,6 @@ const ActivityDetailScreen = ({route, navigation}) => {
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: 20,
-
           }}
           onPress={() => navigation.navigate('ActivityTicket', {activity})}>
           <Text

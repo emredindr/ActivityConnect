@@ -11,73 +11,56 @@ import {
 } from 'react-native';
 import activityService from '../../services/ActivityService';
 import {Searchbar} from 'react-native-paper';
+import filter from 'lodash.filter';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import venueService from '../../services/VenueService';
 import activityTypeService from '../../services/ActivityTypeService';
 import cityService from '../../services/CityService';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Carousel from 'react-native-reanimated-carousel';
-import {Button, Card} from 'react-native-paper';
+import {Card} from 'react-native-paper';
 import Loading from '../../components/Loading/Loading';
 import CustomDropdown from '../../components/Dropdown/Dropdown';
+import styles from './ActivityScreen.Style';
+import ActivityCard from '../../components/ActivityCard/ActivityCard';
+const initialSearchParams = {
+  activityTypeId: null,
+  cityId: null,
+  venueId: null,
+  startDate: null,
+  endDate: null,
+};
 
 const ActivityScreen = ({navigation}) => {
   const [activities, setActivities] = useState([]);
-  const [cityId, setCityId] = useState(null);
-  const [venueId, setVenueId] = useState(null);
-  const [activityTypeId, setActivityTypeId] = useState(null);
+  const [allActivities, setAllActivities] = useState([]);
+  const [searchParams, setSearchParams] = useState({initialSearchParams});
   const [searchText, setSearchText] = useState('');
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [venues, setVenues] = useState([]);
   const [activityTypes, setActivityTypes] = useState([]);
   const [cities, setCities] = useState([]);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
   const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
   const [isStartDatePickerVisible, setStartDatePickerVisibility] =
     useState(false);
+
   const [loading, setLoading] = useState(true);
 
   const width = Dimensions.get('window').width;
 
-  const getActivities = async () => {
-    await activityService.getAll().then(res => {
-      if (res.IsError) return;
-      setActivities(res.result.data);
-    });
-    setLoading(false);
+  const getActivities = searchParams => {
+    activityService
+      .getAll(searchParams)
+      .then(res => {
+        if (res.IsError) return;
+        setActivities(res.result.data);
+        setAllActivities(res.result.data);
+      })
+      .finally(() => setLoading(false));
   };
 
-  const showOrHideStartDatePicker = () => {
-    setStartDatePickerVisibility(!isStartDatePickerVisible);
-  };
-
-  const showOrHideEndDatePicker = () => {
-    setEndDatePickerVisibility(!isEndDatePickerVisible);
-  };
-
-  const handleConfirmStartDate = startDate => {
-    setStartDate(startDate);
-    showOrHideStartDatePicker();
-  };
-
-  const handleConfirmEndDate = endDate => {
-    setEndDate(endDate);
-    showOrHideEndDatePicker();
-  };
-
-  const getStartDate = () => {
-    let newDate = new Date(startDate).toLocaleDateString();
-    return startDate !== '' ? newDate : '';
-  };
-
-  const getEndDate = () => {
-    let newDate = new Date(endDate).toLocaleDateString();
-    return endDate !== '' ? newDate : '';
-  };
-
-  const getActivityTypes = async () => {
-    await activityTypeService.getAll().then(res => {
+  const getActivityTypes = () => {
+    activityTypeService.getAll().then(res => {
       if (res.IsError) return;
 
       setActivityTypes(res.result.data);
@@ -92,18 +75,52 @@ const ActivityScreen = ({navigation}) => {
     });
   };
 
+  const showOrHideStartDatePicker = () => {
+    setStartDatePickerVisibility(!isStartDatePickerVisible);
+  };
+
+  const showOrHideEndDatePicker = () => {
+    setEndDatePickerVisibility(!isEndDatePickerVisible);
+  };
+
+  const handleConfirmStartDate = startDate => {
+    setSearchParams({...searchParams, startDate});
+    if (searchParams.endDate !== null) {
+      if (startDate > searchParams.endDate) {
+        setSearchParams({...searchParams, endDate: startDate});
+        getEndDate
+      }
+    }
+    showOrHideStartDatePicker();
+  };
+
+  const handleConfirmEndDate = endDate => {
+    setSearchParams({...searchParams, endDate});
+    showOrHideEndDatePicker();
+  };
+
+  const getStartDate = () => {
+    let newDate = new Date(searchParams.startDate).toLocaleDateString();
+    return searchParams.startDate !== null ? newDate : '';
+  };
+
+  const getEndDate = () => {
+    let newDate = new Date(searchParams.endDate).toLocaleDateString();
+    return searchParams.endDate !== null ? newDate : '';
+  };
+
   const handleOnChangeActivityType = item => {
-    setActivityTypeId(item.id);
+    setSearchParams({...searchParams, activityTypeId: item.id});
   };
 
   const handleOnChangeCity = item => {
-    setCityId(item.id);
+    setSearchParams({...searchParams, cityId: item.id});
 
     onCitySelected(item.id);
   };
 
   const handleOnChangeVenue = item => {
-    setVenueId(item.id);
+    setSearchParams({...searchParams, venueId: item.id});
   };
 
   const onCitySelected = async cityId => {
@@ -113,14 +130,9 @@ const ActivityScreen = ({navigation}) => {
     });
   };
 
-  const handleOnPressFilter = async (
-    activityTypeId,
-    cityId,
-    venueId,
-    startDate,
-    endDate,
-  ) => {
-    console.log(activityTypeId, cityId, venueId, startDate, endDate);
+  const handleOnPressFilter = filterParams => {
+    getActivities(filterParams);
+
     setIsFilterVisible(false);
   };
 
@@ -131,48 +143,47 @@ const ActivityScreen = ({navigation}) => {
       : 'https://t4.ftcdn.net/jpg/03/15/18/09/240_F_315180932_rhiXFrJN27zXCCdrgx8V5GWbLd9zTHHA.jpg';
   };
 
+  handleSearch = query => {
+    setSearchText(query);
+    const filteredQuery = query.toLowerCase();
+    const filteredData = filter(allActivities, item => {
+      return contains(item, filteredQuery);
+    });
+    setActivities(filteredData);
+  };
+
+  const contains = ({name}, query) => {
+    if (name.toLowerCase().includes(query)) {
+      return true;
+    }
+
+    return false;
+  };
+
   const clearInput = () => {
-    setActivityTypeId(null);
-    setCityId(null);
-    setVenueId(null);
-    setEndDate('');
-    setStartDate('');
+    getActivities(initialSearchParams);
+    setSearchParams(initialSearchParams);
+    setIsFilterVisible(false);
   };
 
   const onRefresh = useCallback(async () => {
     setLoading(true);
-    getActivityTypes();
-    getCities();
-    getActivities();
+    getActivities(searchParams);
   }, []);
 
   useEffect(() => {
     getActivityTypes();
     getCities();
-    getActivities();
+    getActivities(initialSearchParams);
   }, []);
 
-  if (loading) return <Loading />;
-
   return (
-    <ScrollView
-      style={{flex: 1}}
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl refreshing={loading} onRefresh={onRefresh} />
-      }>
-      <View
-        style={{
-          backgroundColor: '#00B9E8',
-          padding: 10,
-          margin: 10,
-          borderRadius: 10,
-          flexDirection: 'row',
-        }}>
+    <View style={styles.container}>
+      <View style={styles.searchBarContainer}>
         <Searchbar
-          style={{flex: 1, backgroundColor: 'white'}}
+          style={styles.searchBarInput}
           placeholder="Ara...."
-          onChangeText={text => setSearchText(text)}
+          onChangeText={handleSearch}
           value={searchText}
           color="#00B9E8"
           placeholderTextColor="#00B9E8"
@@ -184,288 +195,234 @@ const ActivityScreen = ({navigation}) => {
           name="filter-plus-outline"
           size={30}
           color="white"
-          style={{alignSelf: 'center', marginLeft: 10}}
+          style={styles.searchBarIcon}
           onPress={() => setIsFilterVisible(!isFilterVisible)}
         />
       </View>
-      <View
-        style={{
-          backgroundColor: '#fff',
-          display: isFilterVisible ? 'flex' : 'none',
-        }}>
-        <View style={{flexDirection: 'row'}}>
-          <CustomDropdown
-            data={activityTypes}
-            labelField="name"
-            valueField="id"
-            placeholder="Etkinlik Türü Seç"
-            searchPlaceholder="Ara ..."
-            value={activityTypeId}
-            onChange={handleOnChangeActivityType}
-          />
-          <CustomDropdown
-            data={cities}
-            labelField="name"
-            valueField="id"
-            placeholder="İl Seçiniz "
-            value={cityId}
-            onChange={handleOnChangeCity}
-          />
-        </View>
-        <CustomDropdown
-          data={venues}
-          labelField="name"
-          valueField="id"
-          placeholder="Mekan Seçiniz "
-          value={venueId}
-          disable={cityId === null ? true : false}
-          onChange={handleOnChangeVenue}
-        />
+      {isFilterVisible && (
         <View
           style={{
-            margin: 16,
-            height: 50,
-            backgroundColor: 'white',
-            borderRadius: 12,
-            borderWidth: 1,
-            borderColor: '#00B9E8',
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
+            backgroundColor: '#fff',
+            padding: 15,
+            // display: isFilterVisible ? 'flex' : 'none',
           }}>
-          <TouchableOpacity onPress={showOrHideStartDatePicker}>
-            <TextInput
-              style={{
-                textAlign: 'center',
-                fontSize: 16,
-                color: '#00B9E8',
-              }}
-              value={getStartDate()}
-              placeholder="Başlangıç Tarihi"
-              placeholderTextColor="#00B9E8"
-              editable={false}
+          <View style={{flexDirection: 'row'}}>
+            <CustomDropdown
+              data={activityTypes}
+              labelField="name"
+              valueField="id"
+              placeholder="Etkinlik Türü"
+              searchPlaceholder="Ara ..."
+              value={searchParams.activityTypeId}
+              onChange={handleOnChangeActivityType}
             />
-          </TouchableOpacity>
-          <DateTimePickerModal
-            isVisible={isStartDatePickerVisible}
-            mode="date"
-            minimumDate={new Date()}
-            maximumDate={new Date('2024-1-1')}
-            onConfirm={handleConfirmStartDate}
-            onCancel={showOrHideStartDatePicker}
-          />
-          <TouchableOpacity onPress={showOrHideEndDatePicker}>
-            <TextInput
-              style={{
-                textAlign: 'center',
-                fontSize: 16,
-                color: '#00B9E8',
-              }}
-              value={getEndDate()}
-              placeholder="Bitiş Tarihi"
-              placeholderTextColor="#00B9E8"
-              editable={false}
+            <CustomDropdown
+              data={cities}
+              labelField="name"
+              valueField="id"
+              placeholder="İl Seçiniz "
+              value={searchParams.cityId}
+              onChange={handleOnChangeCity}
             />
-          </TouchableOpacity>
-          <DateTimePickerModal
-            isVisible={isEndDatePickerVisible}
-            mode="date"
-            minimumDate={new Date()}
-            maximumDate={new Date('2024-1-1')}
-            onConfirm={handleConfirmEndDate}
-            onCancel={showOrHideEndDatePicker}
-          />
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            margin: 12,
-          }}>
-          <Button
-            mode="outlined"
-            onPress={() => clearInput()}
-            style={{flex: 1, borderWidth: 1, borderColor: '#00B9E8', margin: 2}}
-            textColor="#00B9E8">
-            Sıfırla
-          </Button>
-          <Button
-            mode="outlined"
-            onPress={() =>
-              handleOnPressFilter(
-                activityTypeId,
-                cityId,
-                venueId,
-                startDate,
-                endDate,
-              )
-            }
-            style={{flex: 1, borderWidth: 1, borderColor: '#00B9E8', margin: 2}}
-            textColor="#00B9E8">
-            Filtrele
-          </Button>
-        </View>
-      </View>
-
-      <Carousel
-        loop
-        width={width}
-        height={width / 1.5}
-        autoPlay={true}
-        data={activities.filter(x => x.isFavorite == true)}
-        scrollAnimationDuration={3000}
-        renderItem={({index}) => (
-          <Card
+          </View>
+          <View style={{flexDirection: 'row'}}>
+            <CustomDropdown
+              data={venues}
+              labelField="name"
+              valueField="id"
+              placeholder="Mekan Seçiniz "
+              value={searchParams.venueId}
+              disable={searchParams.cityId === null ? true : false}
+              onChange={handleOnChangeVenue}
+            />
+          </View>
+          <View
             style={{
-              flex: 1,
+              margin: 16,
+              height: 30,
               backgroundColor: 'white',
-              borderRadius: 5,
-              margin: 10,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: '#00B9E8',
+              flexDirection: 'row',
+              justifyContent: 'space-around',
             }}>
-            <Card.Title
-              left={() => <Icon name="star" size={30} color="#FFBF00" />}
-              title={activities[index].name}
-              titleStyle={{
-                fontSize: 18,
-                color: '#00B9E8',
-              }}
-            />
-
-            <Card.Cover
-              style={{}}
-              source={{
-                uri: renderImageData(activities[index].images),
-              }}
-              resizeMode="stretch"
-            />
-          </Card>
-        )}
-      />
-      <View
-        style={{
-          alignItems: 'center',
-          backgroundColor: '#fff',
-          marginTop: 15,
-          margin: 10,
-        }}>
-        <Text
-          style={{
-            fontSize: 18,
-            color: '#00B9E8',
-            textAlign: 'left',
-            fontWeight: 'bold',
-            margin: 10,
-          }}>
-          Tüm Etkinlikler
-        </Text>
-      </View>
-
-      <FlatList
-        data={activities}
-        scrollEnabled={false}
-        renderItem={({item}) => (
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('ActivityDetail', {activity: item})
-            }>
-            <Card
-              style={{
-                margin: 10,
-                borderRadius: 10,
-                borderWidth: 1,
-                borderColor: '#00B9E8',
-                backgroundColor: '#fff',
-              }}>
-              <Card.Title
-                title={item.name}
-                subtitle={
-                  <>
-                    <Icon name="map-marker" size={14} color="#00B9E8" />
-                    <Text style={{fontSize: 14, color: 'black'}}>
-                      {item.venue.name}
-                    </Text>
-                  </>
-                }
-                titleStyle={{
-                  fontSize: 18,
-                  color: '#00B9E8',
+            <TouchableOpacity onPress={showOrHideStartDatePicker}>
+              <TextInput
+                style={{
+                  padding: 0,
                   textAlign: 'center',
-                }}
-              />
-              <Card.Content>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    marginBottom: 3,
-                  }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}>
-                    <Icon name="clock" size={12} color="#00B9E8" />
-                    <Text style={{fontSize: 14, color: 'black'}}>
-                      {new Date(item.startDate).toLocaleDateString('tr-Tr') +
-                        ' - ' +
-                        new Date(item.startDate).toLocaleTimeString('tr-TR')}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}>
-                    <Icon name="currency-usd" size={14} color="#00B9E8" />
-                    <Text style={{fontSize: 14, color: 'black'}}>
-                      {item.ticketPrice == 0
-                        ? 'ÜCRETSİZ'
-                        : `${item.price} + TL`}
-                    </Text>
-                  </View>
-                </View>
-              </Card.Content>
-              <Card.Cover
-                source={{
-                  uri: renderImageData(item.images),
-                }}
-                style={{
-                  height: 400,
-                  zIndex: -1,
-                }}
-                resizeMode="contain"
-              />
-
-              <Text
-                style={{
-                  backgroundColor: 'white',
-                  position: 'absolute',
-                  bottom: 0,
-                  right: 0,
                   fontSize: 16,
                   color: '#00B9E8',
-                  borderWidth: 1,
-                  borderColor: '#00B9E8',
+                }}
+                value={getStartDate()}
+                placeholder="Başlangıç Tarihi"
+                placeholderTextColor="#00B9E8"
+                editable={false}
+              />
+            </TouchableOpacity>
+            <DateTimePickerModal
+              isVisible={isStartDatePickerVisible}
+              mode="date"
+              minimumDate={new Date()}
+              maximumDate={new Date('2024-1-1')}
+              onConfirm={handleConfirmStartDate}
+              onCancel={showOrHideStartDatePicker}
+            />
+            <TouchableOpacity onPress={showOrHideEndDatePicker}>
+              <TextInput
+                style={{
+                  padding: 0,
+                  textAlign: 'center',
+                  fontSize: 16,
+                  color: '#00B9E8',
+                }}
+                value={getEndDate()}
+                placeholder="Bitiş Tarihi"
+                placeholderTextColor="#00B9E8"
+                editable={false}
+              />
+            </TouchableOpacity>
+            <DateTimePickerModal
+              isVisible={isEndDatePickerVisible}
+              mode="date"
+              minimumDate={
+                searchParams.startDate !== null
+                  ? new Date(searchParams.startDate)
+                  : new Date()
+              }
+              maximumDate={new Date('2024-1-1')}
+              onConfirm={handleConfirmEndDate}
+              onCancel={showOrHideEndDatePicker}
+            />
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              margin: 16,
+              justifyContent: 'space-evenly',
+              height: 30,
+            }}>
+            <TouchableOpacity
+              onPress={clearInput}
+              style={{
+                flex: 1,
+                borderWidth: 1,
+                borderColor: '#00B9E8',
+                borderRadius: 12,
+                marginRight: 10,
+              }}>
+              <Text
+                style={{
+                  color: '#00B9E8',
+                  textAlign: 'center',
+                  fontSize: 16,
                   padding: 5,
-                  borderTopLeftRadius: 10,
-                  borderBottomRightRadius: 10,
                 }}>
-                Detaylı Bilgi
+                Temizle
               </Text>
-            </Card>
-          </TouchableOpacity>
-        )}
-      />
-      <Text
-        style={{
-          backgroundColor: '#fff',
-          textAlign: 'center',
-          color: '#00B9E8',
-          fontSize: 16,
-          margin: 10,
-        }}>
-        Toplam {activities.length} etkinlik bulundu.
-      </Text>
-    </ScrollView>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => handleOnPressFilter(searchParams)}
+              style={{
+                marginLeft: 10,
+                flex: 1,
+                borderWidth: 1,
+                borderColor: '#00B9E8',
+                borderRadius: 12,
+              }}
+              textColor="#00B9E8">
+              <Text
+                style={{
+                  color: '#00B9E8',
+                  textAlign: 'center',
+                  fontSize: 16,
+                  padding: 5,
+                }}>
+                Filtrele
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {loading ? (
+        <Loading />
+      ) : (
+        <ScrollView
+          style={styles.container}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={onRefresh} />
+          }>
+          {searchText.length == 0 && (
+            <Carousel
+              loop
+              width={width}
+              height={width / 1.5}
+              autoPlay={true}
+              data={activities.filter(x => x.isFavorite == true)}
+              scrollAnimationDuration={3000}
+              renderItem={({index}) => (
+                <Card
+                  style={{
+                    flex: 1,
+                    backgroundColor: 'white',
+                    borderRadius: 5,
+                    margin: 10,
+                  }}>
+                  <Card.Title
+                    left={() => <Icon name="star" size={30} color="#FFBF00" />}
+                    title={activities[index].name}
+                    titleStyle={{
+                      fontSize: 18,
+                      color: '#00B9E8',
+                    }}
+                  />
+
+                  <Card.Cover
+                    source={{
+                      uri: renderImageData(activities[index].images),
+                    }}
+                    resizeMode="stretch"
+                  />
+                </Card>
+              )}
+            />
+          )}
+
+          {!searchText.length > 0 && (
+            <View style={styles.dividerContainer}>
+              <Text style={styles.dividerText}>Tüm Etkinlikler</Text>
+            </View>
+          )}
+          <FlatList
+            data={activities}
+            scrollEnabled={false}
+            renderItem={({item, index}) => (
+              <ActivityCard
+                item={item}
+                index={index}
+                onSelect={() =>
+                  navigation.navigate('ActivityDetail', {activity: item})
+                }
+              />
+            )}
+          />
+
+          {activities.length < 1 ? (
+            <Text style={styles.totalCountText}>
+              Aradığınız kısıtta etkinlik bulunamamıştır.
+            </Text>
+          ) : (
+            <Text style={styles.totalCountText}>
+              Toplam {activities.length} etkinlik bulundu.
+            </Text>
+          )}
+        </ScrollView>
+      )}
+    </View>
   );
 };
 

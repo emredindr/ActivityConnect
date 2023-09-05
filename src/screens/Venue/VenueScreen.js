@@ -5,19 +5,30 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  RefreshControl,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import venueService from '../../services/VenueService';
+import {Searchbar} from 'react-native-paper';
+import Loading from '../../components/Loading/Loading';
 
 const VenueScreen = ({navigation}) => {
   const [venues, setVenues] = useState(data);
+  const [searchText, setSearchText] = useState('');
+  const [loading, setLoading] = useState(true);
+
   const getVenues = async () => {
     await venueService.getAll().then(res => {
       if (res.IsError) return;
 
-      // console.log(res.result.data);
-      // setVenues(res.result.data);
+      setVenues(res.result.data);
+      setLoading(false);
     });
+  };
+
+  const onRefresh = () => {
+    setLoading(true);
+    getVenues();
   };
 
   useEffect(() => {
@@ -28,90 +39,96 @@ const VenueScreen = ({navigation}) => {
     <View
       style={{
         flex: 1,
-        backgroundColor: '#fff',
-        padding: 8,
       }}>
-      <FlatList
-        data={venues}
-        showsVerticalScrollIndicator={false}
-        renderItem={({item}) => (
-          <TouchableOpacity
-            onPress={() => navigation.navigate('VenueDetail', {venue: item})}
-            style={{
-              backgroundColor: '#fff',
-              marginVertical: 8,
-              marginHorizontal: 8,
-              padding: 8,
-              marginBottom: 10,
-              borderRadius: 10,
-              shadowColor: '#000',
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-              alignItems: 'center',
-              borderWidth: 1,
-            }}>
-            <Text
+      <View
+        style={{
+          backgroundColor: '#00B9E8',
+          padding: 10,
+          margin: 10,
+          borderRadius: 10,
+          flexDirection: 'row',
+        }}>
+        <Searchbar
+          style={{flex: 1, backgroundColor: 'white'}}
+          placeholder="Ara...."
+          onChangeText={text => setSearchText(text)}
+          value={searchText}
+          color="#00B9E8"
+          placeholderTextColor="#00B9E8"
+          iconColor="#00B9E8"
+          cursorColor="#00B9E8"
+          autoCapitalize="none"
+        />
+      </View>
+      {loading ? (
+        <Loading />
+      ) : (
+        <FlatList
+          refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={onRefresh} />
+          }
+          data={venues}
+          showsVerticalScrollIndicator={false}
+          renderItem={({item}) => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate('VenueDetail', {venue: item})}
               style={{
-                fontSize: 16,
-                fontWeight: 'bold',
-                margin: 8,
-                color: '#000',
-                alignSelf: 'flex-start',
-                padding: 8,
-                borderTopLeftRadius: 10,
-                borderTopRightRadius: 10,
                 backgroundColor: '#fff',
-                shadowColor: '#000',
-                shadowOffset: {
-                  width: 0,
-                  height: 2,
-                },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
+                borderColor: '#00B9E8',
+                marginVertical: 8,
+                marginHorizontal: 8,
+                padding: 8,
+                marginBottom: 10,
                 borderRadius: 10,
+                alignItems: 'center',
                 borderWidth: 1,
-                borderColor: '#fff',
-                borderBottomWidth: 0,
               }}>
-              {item.name}
-            </Text>
-            <Image
-              style={{
-                width: '100%',
-                height: 300,
-                borderRadius: 10,
-                borderTopLeftRadius: 10,
-                borderTopRightRadius: 10,
-              }}
-              source={{
-                uri: item.images[0].url,
-              }}
-            />
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: 'bold',
-                margin: 8,
-                color: '#00539a',
-                alignSelf: 'flex-end',
-                position: 'absolute',
-                bottom: 0,
-                right: 0,
-                backgroundColor: '#fff',
-                padding: 8,
-                borderTopLeftRadius: 10,
-                borderTopRightRadius: 10,
-              }}>
-              Detaylı Gör
-            </Text>
-          </TouchableOpacity>
-        )}
-      />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  margin: 8,
+                  marginLeft: 0,
+                  color: '#00B9E8',
+                  alignSelf: 'flex-start',
+                  padding: 8,
+                  borderTopLeftRadius: 10,
+                  borderTopRightRadius: 10,
+                }}>
+                {item.name}
+              </Text>
+              <Image
+                style={{
+                  width: '100%',
+                  height: 300,
+                  borderRadius: 10,
+                  borderTopLeftRadius: 10,
+                  borderTopRightRadius: 10,
+                }}
+                source={{
+                  uri: item.images[0].url,
+                }}
+              />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  margin: 8,
+                  color: '#00B9E8',
+                  alignSelf: 'flex-end',
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
+                  backgroundColor: '#fff',
+                  padding: 8,
+                  borderTopLeftRadius: 10,
+                }}>
+                Detaylı Gör
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
+      )}
     </View>
   );
 };

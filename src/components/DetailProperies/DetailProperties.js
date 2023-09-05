@@ -34,7 +34,7 @@ const DetailProperties = ({fieldKey, fieldValue, isPressable = false,onClick}) =
         )}
         {isPressable == false ? (
           <>
-            {fieldValue.length > 40 ? (
+            {fieldValue.length > 25 ? (
               <TextInput
                 style={{
                   fontSize: 15,

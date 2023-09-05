@@ -36,44 +36,48 @@ const ActivityTicket = ({route}) => {
   }
 
   const calculateAmount = () => {
-    let amount = 0;
-    selectedSeats.forEach(seat => {
-      switch (seat.name) {
-        case 'A':
-          amount += 110;
-          break;
-        case 'B':
-          amount += 80;
-          break;
-        case 'C':
-          amount += 90;
-          break;
-        case 'D':
-          amount += 75;
-          break;
-        case 'E':
-          amount += 85;
-          break;
-        case 'F':
-          amount += 65;
-          break;
-        case 'G':
-          amount += 55;
-          break;
-        case 'H':
-          amount += 45;
-          break;
-        case 'İ':
-          amount += 35;
-          break;
-        case 'J':
-          amount += 25;
-          break;
-        default:
-          break;
-      }
-    });
-    return `${amount} TL`;
+    if (activity.ticketPrice !== 0) {
+      let amount = activity.ticketPrice;
+      selectedSeats.forEach(seat => {
+        switch (seat.name) {
+          case 'A':
+            amount += 110;
+            break;
+          case 'B':
+            amount += 80;
+            break;
+          case 'C':
+            amount += 90;
+            break;
+          case 'D':
+            amount += 75;
+            break;
+          case 'E':
+            amount += 85;
+            break;
+          case 'F':
+            amount += 65;
+            break;
+          case 'G':
+            amount += 55;
+            break;
+          case 'H':
+            amount += 45;
+            break;
+          case 'İ':
+            amount += 35;
+            break;
+          case 'J':
+            amount += 25;
+            break;
+          default:
+            break;
+        }
+      });
+      return `${amount} TL`;
+    } else {
+      return 'Ücretsiz';
+    }
   };
 
   const seatNameGenerator = (name, id) => {

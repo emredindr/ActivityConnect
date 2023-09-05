@@ -1,8 +1,7 @@
-import {View, Text, Image, Dimensions} from 'react-native';
+import {View, Text, Image, Dimensions, ScrollView} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import Carousel from 'react-native-reanimated-carousel';
-import {Button} from 'react-native-paper';
 
 const VenueDetailScreen = ({route, navigation}) => {
   const [venue] = useState(route.params.venue);
@@ -28,7 +27,7 @@ const VenueDetailScreen = ({route, navigation}) => {
   }, [navigation]);
 
   return (
-    <View style={{flex: 1}}>
+    <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
       <Carousel
         loop
         width={width}
@@ -101,7 +100,7 @@ const VenueDetailScreen = ({route, navigation}) => {
           {venue.phoneNumber}
         </Text>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
