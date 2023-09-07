@@ -12,7 +12,7 @@ const Stack = createNativeStackNavigator();
 
 const AuthNavigator = () => {
   const {state, signout} = useContext(AuthContext);
-  const [user, setUser] = useState();
+  const [user, setUser] = useState({});
 
   const checkUserSession = async () => {
     const userSession = JSON.parse(await AsyncStorage.getItem('@USER'));
@@ -37,7 +37,11 @@ const AuthNavigator = () => {
             headerTitle: 'Hesabım',
             headerRight: () => (
               <Pressable onPress={signout}>
-                <Icon name="logout" size={30} color="#900" />
+                <Icon
+                  name="logout"
+                  size={30}
+                  color="#900"
+                />
               </Pressable>
             ),
           }}

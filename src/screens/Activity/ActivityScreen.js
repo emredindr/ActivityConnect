@@ -1,52 +1,32 @@
 import {useState, useEffect, useCallback} from 'react';
-import {
-  Text,
-  View,
-  FlatList,
-  TextInput,
-  TouchableOpacity,
-  Dimensions,
-  ScrollView,
-  RefreshControl,
-} from 'react-native';
+import {Text, View, FlatList, TextInput, TouchableOpacity, Dimensions, ScrollView, RefreshControl} from 'react-native';
 import activityService from '../../services/ActivityService';
-import {Searchbar} from 'react-native-paper';
 import filter from 'lodash.filter';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import venueService from '../../services/VenueService';
 import activityTypeService from '../../services/ActivityTypeService';
 import cityService from '../../services/CityService';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import Carousel from 'react-native-reanimated-carousel';
-import {Card} from 'react-native-paper';
+
 import Loading from '../../components/Loading/Loading';
 import CustomDropdown from '../../components/Dropdown/Dropdown';
 import styles from './ActivityScreen.Style';
 import ActivityCard from '../../components/ActivityCard/ActivityCard';
-const initialSearchParams = {
-  activityTypeId: null,
-  cityId: null,
-  venueId: null,
-  startDate: null,
-  endDate: null,
-};
+import SearchBar from '../../components/SearchBar/SearchBar';
+import CustomCarousel from '../../components/CustomCarousel/CustomCarousel';
 
 const ActivityScreen = ({navigation}) => {
   const [activities, setActivities] = useState([]);
   const [allActivities, setAllActivities] = useState([]);
-  const [searchParams, setSearchParams] = useState({initialSearchParams});
+  const [searchParams, setSearchParams] = useState({activityTypeId: null, cityId: null, venueId: null, startDate: null, endDate: null});
   const [searchText, setSearchText] = useState('');
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [venues, setVenues] = useState([]);
   const [activityTypes, setActivityTypes] = useState([]);
   const [cities, setCities] = useState([]);
   const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
-  const [isStartDatePickerVisible, setStartDatePickerVisibility] =
-    useState(false);
-
+  const [isStartDatePickerVisible, setStartDatePickerVisibility] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  const width = Dimensions.get('window').width;
 
   const getActivities = searchParams => {
     activityService
@@ -67,8 +47,8 @@ const ActivityScreen = ({navigation}) => {
     });
   };
 
-  const getCities = async () => {
-    await cityService.getAll().then(res => {
+  const getCities = () => {
+    cityService.getAll().then(res => {
       if (res.IsError) return;
 
       setCities(res.result.data);
@@ -88,7 +68,7 @@ const ActivityScreen = ({navigation}) => {
     if (searchParams.endDate !== null) {
       if (startDate > searchParams.endDate) {
         setSearchParams({...searchParams, endDate: startDate});
-        getEndDate
+        getEndDate;
       }
     }
     showOrHideStartDatePicker();
@@ -100,13 +80,11 @@ const ActivityScreen = ({navigation}) => {
   };
 
   const getStartDate = () => {
-    let newDate = new Date(searchParams.startDate).toLocaleDateString();
-    return searchParams.startDate !== null ? newDate : '';
+    return searchParams.startDate !== null ? `${searchParams.startDate.getDate()}-${searchParams.startDate.getMonth() + 1}-${searchParams.startDate.getFullYear()}` : null;
   };
 
   const getEndDate = () => {
-    let newDate = new Date(searchParams.endDate).toLocaleDateString();
-    return searchParams.endDate !== null ? newDate : '';
+    return searchParams.endDate !== null ? `${searchParams.endDate.getDate()}-${searchParams.endDate.getMonth() + 1}-${searchParams.endDate.getFullYear()}` : null;
   };
 
   const handleOnChangeActivityType = item => {
@@ -136,14 +114,7 @@ const ActivityScreen = ({navigation}) => {
     setIsFilterVisible(false);
   };
 
-  const renderImageData = images => {
-    const image = images.find(x => x.isDefault === true);
-    return image
-      ? image.url
-      : 'https://t4.ftcdn.net/jpg/03/15/18/09/240_F_315180932_rhiXFrJN27zXCCdrgx8V5GWbLd9zTHHA.jpg';
-  };
-
-  handleSearch = query => {
+  const handleSearch = query => {
     setSearchText(query);
     const filteredQuery = query.toLowerCase();
     const filteredData = filter(allActivities, item => {
@@ -156,13 +127,12 @@ const ActivityScreen = ({navigation}) => {
     if (name.toLowerCase().includes(query)) {
       return true;
     }
-
     return false;
   };
 
   const clearInput = () => {
-    getActivities(initialSearchParams);
-    setSearchParams(initialSearchParams);
+    setSearchParams({activityTypeId: null, cityId: null, venueId: null, startDate: null, endDate: null});
+    getActivities(searchParams);
     setIsFilterVisible(false);
   };
 
@@ -174,37 +144,22 @@ const ActivityScreen = ({navigation}) => {
   useEffect(() => {
     getActivityTypes();
     getCities();
-    getActivities(initialSearchParams);
+    getActivities(searchParams);
   }, []);
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchBarContainer}>
-        <Searchbar
-          style={styles.searchBarInput}
-          placeholder="Ara...."
-          onChangeText={handleSearch}
-          value={searchText}
-          color="#00B9E8"
-          placeholderTextColor="#00B9E8"
-          iconColor="#00B9E8"
-          cursorColor="#00B9E8"
-          autoCapitalize="none"
-        />
-        <Icon
-          name="filter-plus-outline"
-          size={30}
-          color="white"
-          style={styles.searchBarIcon}
-          onPress={() => setIsFilterVisible(!isFilterVisible)}
-        />
-      </View>
+      <SearchBar
+        searchText={searchText}
+        onChangeText={text => handleSearch(text)}
+        onPress={() => setIsFilterVisible(!isFilterVisible)}
+      />
+
       {isFilterVisible && (
         <View
           style={{
             backgroundColor: '#fff',
             padding: 15,
-            // display: isFilterVisible ? 'flex' : 'none',
           }}>
           <View style={{flexDirection: 'row'}}>
             <CustomDropdown
@@ -286,11 +241,7 @@ const ActivityScreen = ({navigation}) => {
             <DateTimePickerModal
               isVisible={isEndDatePickerVisible}
               mode="date"
-              minimumDate={
-                searchParams.startDate !== null
-                  ? new Date(searchParams.startDate)
-                  : new Date()
-              }
+              minimumDate={searchParams.startDate !== null ? new Date(searchParams.startDate) : new Date()}
               maximumDate={new Date('2024-1-1')}
               onConfirm={handleConfirmEndDate}
               onCancel={showOrHideEndDatePicker}
@@ -354,45 +305,14 @@ const ActivityScreen = ({navigation}) => {
           style={styles.container}
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl refreshing={loading} onRefresh={onRefresh} />
-          }>
-          {searchText.length == 0 && (
-            <Carousel
-              loop
-              width={width}
-              height={width / 1.5}
-              autoPlay={true}
-              data={activities.filter(x => x.isFavorite == true)}
-              scrollAnimationDuration={3000}
-              renderItem={({index}) => (
-                <Card
-                  style={{
-                    flex: 1,
-                    backgroundColor: 'white',
-                    borderRadius: 5,
-                    margin: 10,
-                  }}>
-                  <Card.Title
-                    left={() => <Icon name="star" size={30} color="#FFBF00" />}
-                    title={activities[index].name}
-                    titleStyle={{
-                      fontSize: 18,
-                      color: '#00B9E8',
-                    }}
-                  />
-
-                  <Card.Cover
-                    source={{
-                      uri: renderImageData(activities[index].images),
-                    }}
-                    resizeMode="stretch"
-                  />
-                </Card>
-              )}
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={onRefresh}
             />
-          )}
+          }>
+          {searchText.length === 0 && activities.length > 0 && <CustomCarousel data={activities.filter(x => x.isFavorite == true)} />}
 
-          {!searchText.length > 0 && (
+          {!searchText.length > 0 && !activities.length < 1 && (
             <View style={styles.dividerContainer}>
               <Text style={styles.dividerText}>Tüm Etkinlikler</Text>
             </View>
@@ -404,22 +324,12 @@ const ActivityScreen = ({navigation}) => {
               <ActivityCard
                 item={item}
                 index={index}
-                onSelect={() =>
-                  navigation.navigate('ActivityDetail', {activity: item})
-                }
+                onSelect={() => navigation.navigate('ActivityDetail', {activity: item})}
               />
             )}
           />
 
-          {activities.length < 1 ? (
-            <Text style={styles.totalCountText}>
-              Aradığınız kısıtta etkinlik bulunamamıştır.
-            </Text>
-          ) : (
-            <Text style={styles.totalCountText}>
-              Toplam {activities.length} etkinlik bulundu.
-            </Text>
-          )}
+          {activities.length < 1 ? <Text style={styles.totalCountText}>Aradığınız kısıtta etkinlik bulunamamıştır.</Text> : <Text style={styles.totalCountText}>Toplam {activities.length} etkinlik bulundu.</Text>}
         </ScrollView>
       )}
     </View>

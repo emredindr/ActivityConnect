@@ -16,7 +16,11 @@ const TabNavigator = () => {
           title: 'Etkinlikler',
 
           tabBarIcon: () => (
-            <Icon name="calendar-search" size={25} color="#00B9E8" />
+            <Icon
+              name="calendar-search"
+              size={25}
+              color="#00B9E8"
+            />
           ),
           tabBarActiveTintColor: '#00B9E8',
         }}
@@ -28,7 +32,11 @@ const TabNavigator = () => {
         options={{
           title: 'Mekanlar',
           tabBarIcon: () => (
-            <Icon name="home-group" size={25} color="#00B9E8" />
+            <Icon
+              name="home-group"
+              size={25}
+              color="#00B9E8"
+            />
           ),
           tabBarActiveTintColor: '#00B9E8',
         }}
@@ -38,7 +46,13 @@ const TabNavigator = () => {
         component={AuthStackNavigator}
         options={{
           title: 'Hesabım',
-          tabBarIcon: () => <Icon name="account" size={25} color="#00B9E8" />,
+          tabBarIcon: () => (
+            <Icon
+              name="account"
+              size={25}
+              color="#00B9E8"
+            />
+          ),
           tabBarActiveTintColor: '#00B9E8',
         }}
       />

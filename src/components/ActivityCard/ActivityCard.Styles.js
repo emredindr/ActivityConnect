@@ -9,9 +9,11 @@ export default StyleSheet.create({
     backgroundColor: '#fff',
   },
   cartTitle: {
-    fontSize: 18,
+    fontSize: 20,
     color: '#00B9E8',
     textAlign: 'center',
+    alignSelf: 'flex-start',
+    textDecorationLine: 'underline',
   },
   cardContentContainer: {
     flexDirection: 'row',

@@ -1,7 +1,8 @@
-import {View, Text, Image, Dimensions, ScrollView} from 'react-native';
+import {View, StyleSheet, Text, Image, Dimensions, ScrollView} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import Carousel from 'react-native-reanimated-carousel';
+import styles from './VenueDetailScreen.Style';
 
 const VenueDetailScreen = ({route, navigation}) => {
   const [venue] = useState(route.params.venue);
@@ -27,7 +28,9 @@ const VenueDetailScreen = ({route, navigation}) => {
   }, [navigation]);
 
   return (
-    <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      showsVerticalScrollIndicator={false}>
       <Carousel
         loop
         width={width}
@@ -36,31 +39,10 @@ const VenueDetailScreen = ({route, navigation}) => {
         data={venue.images}
         scrollAnimationDuration={3000}
         renderItem={({index}) => (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: 'white',
-              borderRadius: 5,
-              shadowColor: '#000',
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
-              elevation: 5,
-              margin: 10,
-              padding: 10,
-            }}>
+          <View style={styles.imageContainer}>
             <Image
               source={{uri: venue.images[index].url}}
-              style={{
-                width: '100%',
-                height: '100%',
-                borderRadius: 5,
-              }}
+              style={styles.image}
             />
           </View>
         )}
@@ -70,35 +52,19 @@ const VenueDetailScreen = ({route, navigation}) => {
         <MapView
           provider={PROVIDER_GOOGLE}
           initialRegion={coords}
-          style={{
-            width: '100%',
-
-            height: 300,
-          }}>
+          style={styles.map}>
           <Marker coordinate={coords} />
         </MapView>
       </View>
-      <View
-        style={{
-          flex: 1,
-          padding: 10,
-          margin: 10,
-          borderRadius: 10,
-          backgroundColor: 'white',
-        }}>
-        <Text style={{fontSize: 20, fontWeight: 'bold'}}>{venue.name}</Text>
-        <Text style={{fontSize: 15, fontWeight: 'bold'}}>
-          {venue.address.openAddress}
+      <View style={styles.detailContainer}>
+        <Text style={styles.venueName}>{venue.name}</Text>
+        <Text style={styles.venueDetailTexts}>{venue.address.openAddress}</Text>
+        <Text style={styles.venueDetailTexts}>
+          {' '}
+          {venue.address.districtName} / {venue.address.cityName}{' '}
         </Text>
-        <Text style={{fontSize: 15, fontWeight: 'bold'}}>
-          {venue.address.districtName} / {venue.address.cityName}
-        </Text>
-        <Text style={{fontSize: 15, fontWeight: 'bold'}}>
-          Koltuk Kapasitesi : {venue.seatCapacity}
-        </Text>
-        <Text style={{fontSize: 15, fontWeight: 'bold'}}>
-          {venue.phoneNumber}
-        </Text>
+        <Text style={styles.venueDetailTexts}>Koltuk Kapasitesi : {venue.seatCapacity}</Text>
+        <Text style={styles.venueDetailTexts}>{venue.phoneNumber}</Text>
       </View>
     </ScrollView>
   );

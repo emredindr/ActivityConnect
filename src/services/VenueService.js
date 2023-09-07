@@ -5,7 +5,7 @@ class VenueService {
     return await apiGet('Venue/GetVenueList');
   }
   async getAllByCityId(cityId) {
-    return await apiGetById('Venue/GetVenueListByCityId', {params: {"cityId":cityId}});
+    return await apiGetById('Venue/GetVenueListByCityId', {params: {cityId: cityId}});
   }
 }
 

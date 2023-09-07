@@ -7,6 +7,8 @@ const authReducer = (state, action) => {
   switch (action.type) {
     case 'signin':
       return {user: action.payload};
+    case 'signup':
+      return {user: action.payload};
     case 'signout':
       return {user: null};
     default:
@@ -14,18 +16,23 @@ const authReducer = (state, action) => {
   }
 };
 
-const signup = dispacth => {
-  return ({email, password}) => {};
-};
+const signup =
+  dispacth =>
+  async ({name, surname, email, password, userName, phoneNumber, gender, birthdate}) => {
+    try {
+      const response = await axios.post(Config.API_Local_URL + 'Auth/Register', {name, surname, email, password, userName, phoneNumber, gender, birthdate: new Date(birthdate)});
+      await AsyncStorage.setItem('@USER', JSON.stringify(response.data.result));
+      dispacth({type: 'signup', payload: response.data.result});
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
 const signin =
   dispacth =>
   async ({email, password}) => {
     try {
-      const response = await axios.post(Config.API_Local_URL + 'Auth/Login', {
-        email,
-        password,
-      });
+      const response = await axios.post(Config.API_Local_URL + 'Auth/Login', {email, password});
       await AsyncStorage.setItem('@USER', JSON.stringify(response.data.result));
       dispacth({type: 'signin', payload: response.data.result});
     } catch (error) {
@@ -38,8 +45,4 @@ const signout = dispacth => async () => {
   dispacth({type: 'signout'});
 };
 
-export const {Context, Provider} = createDataContext(
-  authReducer,
-  {signin, signout, signup},
-  {user: null},
-);
+export const {Context, Provider} = createDataContext(authReducer, {signin, signout, signup}, {user: null});

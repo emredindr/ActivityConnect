@@ -14,8 +14,14 @@ const ActivityStackNavigator = () => {
         component={ActivityScreen}
         options={{headerShown: false}}
       />
-      <Stack.Screen name="ActivityDetail" component={ActivityDetailScreen} />
-      <Stack.Screen name="VenueActivity" component={VenueActivityScreen} />
+      <Stack.Screen
+        name="ActivityDetail"
+        component={ActivityDetailScreen}
+      />
+      <Stack.Screen
+        name="VenueActivity"
+        component={VenueActivityScreen}
+      />
 
       <Stack.Screen
         name="ActivityTicket"

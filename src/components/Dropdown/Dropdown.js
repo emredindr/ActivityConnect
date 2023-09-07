@@ -2,15 +2,7 @@ import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {Dropdown} from 'react-native-element-dropdown';
 
-const CustomDropdown = ({
-  data,
-  labelField,
-  valueField,
-  placeholder,
-  value,
-  onChange,
-  ...rest
-}) => {
+const CustomDropdown = ({data, labelField, valueField, placeholder, value, onChange, ...rest}) => {
   return (
     <Dropdown
       {...rest}

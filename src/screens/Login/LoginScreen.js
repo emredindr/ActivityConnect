@@ -1,13 +1,7 @@
-import {
-  StyleSheet,
-  View,
-  Text,
-  Button,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
+import {View, Text, Button, TextInput, TouchableOpacity} from 'react-native';
 import React, {useState, useContext} from 'react';
 import {Context as AuthContext} from '../../context/AuthContext';
+import styles from './LoginScreen.Style';
 
 const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState('asd@asd.com');
@@ -20,7 +14,7 @@ const LoginScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Sign In</Text>
+      <Text style={styles.header}>Hoşgeldiniz</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -36,46 +30,17 @@ const LoginScreen = ({navigation}) => {
       />
 
       <Button
-        title="Sign In"
+        title="Giriş Yap"
         onPress={() => signin({email, password})}
         color="#007aff"
         accessibilityLabel="Sign In Button"
       />
 
       <TouchableOpacity onPress={navigateToRegister}>
-        <Text style={styles.registerText}>
-          Don't have an account? Register here
-        </Text>
+        <Text style={styles.registerText}>Hesabınız yok mu? Üye olmak için tıklayınız.</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
 export default LoginScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-  },
-  header: {
-    fontSize: 24,
-    marginBottom: 16,
-  },
-  input: {
-    width: '100%',
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    marginBottom: 16,
-  },
-  registerText: {
-    color: 'blue',
-    textDecorationLine: 'underline',
-    fontSize: 16,
-  },
-});

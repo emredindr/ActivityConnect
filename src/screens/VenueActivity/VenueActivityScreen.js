@@ -17,9 +17,7 @@ const VenueActivityScreen = ({route, navigation}) => {
 
   const renderImageData = images => {
     const image = images.find(x => x.isDefault === true);
-    return image
-      ? image.url
-      : 'https://t4.ftcdn.net/jpg/03/15/18/09/240_F_315180932_rhiXFrJN27zXCCdrgx8V5GWbLd9zTHHA.jpg';
+    return image ? image.url : 'https://t4.ftcdn.net/jpg/03/15/18/09/240_F_315180932_rhiXFrJN27zXCCdrgx8V5GWbLd9zTHHA.jpg';
   };
 
   useEffect(() => {
@@ -63,10 +61,7 @@ const VenueActivityScreen = ({route, navigation}) => {
         data={venue.activities}
         scrollEnabled={false}
         renderItem={({item}) => (
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('ActivityDetail', {activity: item})
-            }>
+          <TouchableOpacity onPress={() => navigation.navigate('ActivityDetail', {activity: item})}>
             <Card
               style={{
                 margin: 10,
@@ -95,24 +90,24 @@ const VenueActivityScreen = ({route, navigation}) => {
                       flexDirection: 'row',
                       alignItems: 'center',
                     }}>
-                    <Icon name="clock" size={12} color="#00B9E8" />
-                    <Text style={{fontSize: 14, color: 'black'}}>
-                      {new Date(item.startDate).toLocaleDateString('tr-Tr') +
-                        ' - ' +
-                        new Date(item.startDate).toLocaleTimeString('tr-TR')}
-                    </Text>
+                    <Icon
+                      name="clock"
+                      size={12}
+                      color="#00B9E8"
+                    />
+                    <Text style={{fontSize: 14, color: 'black'}}>{new Date(item.startDate).toLocaleDateString('tr-Tr') + ' - ' + new Date(item.startDate).toLocaleTimeString('tr-TR')}</Text>
                   </View>
                   <View
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
                     }}>
-                    <Icon name="currency-usd" size={14} color="#00B9E8" />
-                    <Text style={{fontSize: 14, color: 'black'}}>
-                      {item.ticketPrice == 0
-                        ? 'ÜCRETSİZ'
-                        : `${item.ticketPrice} + TL`}
-                    </Text>
+                    <Icon
+                      name="currency-usd"
+                      size={14}
+                      color="#00B9E8"
+                    />
+                    <Text style={{fontSize: 14, color: 'black'}}>{item.ticketPrice == 0 ? 'ÜCRETSİZ' : `${item.ticketPrice} + TL`}</Text>
                   </View>
                 </View>
               </Card.Content>
@@ -126,7 +121,6 @@ const VenueActivityScreen = ({route, navigation}) => {
                 }}
                 resizeMode="contain"
               />
-
               <Text
                 style={{
                   backgroundColor: 'white',

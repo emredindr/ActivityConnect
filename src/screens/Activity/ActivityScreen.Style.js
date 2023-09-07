@@ -6,29 +6,17 @@ export default StyleSheet.create({
   container: {
     flex: 1,
   },
-  searchBarContainer: {
-    backgroundColor: '#00B9E8',
-    padding: 10,
-    margin: 10,
-    borderRadius: 10,
-    flexDirection: 'row',
-  },
-  searchBarInput: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-
-  searchBarIcon: {
-    alignSelf: 'center',
-    marginLeft: 10,
-  },
-
   totalCountText: {
     backgroundColor: '#fff',
     textAlign: 'center',
     color: '#00B9E8',
     fontSize: 16,
     margin: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    
+    alignSelf: 'center',
+
   },
   dividerContainer: {
     alignItems: 'center',
