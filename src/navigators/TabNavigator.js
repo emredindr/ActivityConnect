@@ -4,10 +4,19 @@ import VenueStackNavigator from './VenueNavigator';
 import AuthStackNavigator from './AuthNavigator';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useNetInfo} from '@react-native-community/netinfo';
+import NetworkError from '../components/NetworkError/NetworkError';
+import {View} from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
+  const netinfo = useNetInfo();
+
+  if (!netinfo?.isConnected) {
+    return <NetworkError />;
+  }
+
   return (
     <Tab.Navigator screenOptions={{headerShown: false}}>
       <Tab.Screen
