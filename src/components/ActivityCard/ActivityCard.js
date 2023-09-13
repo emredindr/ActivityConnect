@@ -3,9 +3,7 @@ import {Card} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from './ActivityCard.Styles';
 
-import React from 'react';
-
-const ActivityCard = ({item, onSelect}) => {
+const ActivityCard = ({item, onSelect, isFavVisible = true}) => {
   const renderImageData = images => {
     const image = images.find(x => x.isDefault === true);
     return image ? image.url : 'https://t4.ftcdn.net/jpg/03/15/18/09/240_F_315180932_rhiXFrJN27zXCCdrgx8V5GWbLd9zTHHA.jpg';
@@ -26,16 +24,30 @@ const ActivityCard = ({item, onSelect}) => {
             </>
           }
           titleStyle={styles.cartTitle}
-          right={() => (
-            <Icon
-              onPress={() => {}}
-              name="heart"
-              size={30}
-              color="#00B9E8"
-            />
-          )}
+          right={() =>
+            isFavVisible === true ? (
+              <Icon
+                onPress={() => {}}
+                name="heart"
+                size={30}
+                color="#00B9E8"
+              />
+            ) : (
+              <Text
+                style={{
+                  fontSize: 20,
+                  color: '#F5F5F5',
+                  backgroundColor: '#00B9E8',
+                  borderRadius: 10,
+                  padding: 5,
+                }}>
+                PASSED
+              </Text>
+            )
+          }
           rightStyle={{
-            marginRight: 30,
+            marginRight: isFavVisible === true ? 30 : 10,
+            marginTop: isFavVisible === true ? 0 : 10,
             bottom: 14,
           }}
         />

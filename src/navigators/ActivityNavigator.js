@@ -2,7 +2,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import ActivityDetailScreen from '../screens/ActivityDetail/ActivityDetailScreen';
 import ActivityScreen from '../screens/Activity/ActivityScreen';
 import VenueActivityScreen from '../screens/VenueActivity/VenueActivityScreen';
-import ActivityTicketScreen from '../screens/ActivityTicket/ActivityTicket';
+import ActivityTicketScreen from '../screens/ActivityTicket/ActivityTicketScreen';
+import ActivityHistoryScreen from '../screens/ActivityHistory/ActivityHistoryScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +30,14 @@ const ActivityStackNavigator = () => {
           title: 'Koltuk Seçimi',
         }}
         component={ActivityTicketScreen}
+      />
+
+      <Stack.Screen
+        name="ActivityHistory"
+        options={{
+          title: 'Geçmiş Etkinlikler',
+        }}
+        component={ActivityHistoryScreen}
       />
     </Stack.Navigator>
   );

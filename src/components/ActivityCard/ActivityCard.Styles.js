@@ -24,7 +24,10 @@ export default StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  cardText: {fontSize: 14, color: 'black'},
+  cardText: {
+    fontSize: 14,
+    color: 'black',
+  },
   textInfo: {
     backgroundColor: 'white',
     position: 'absolute',

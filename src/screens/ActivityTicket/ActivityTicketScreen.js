@@ -3,7 +3,7 @@ import {useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './ActivityTicket.Style';
 
-const ActivityTicket = ({route}) => {
+const ActivityTicketScreen = ({route}) => {
   const [activity] = useState(route.params.activity);
   const [selectedSeats, setSelectedSeats] = useState([]);
 
@@ -99,7 +99,7 @@ const ActivityTicket = ({route}) => {
   );
 };
 
-export default ActivityTicket;
+export default ActivityTicketScreen;
 
 export const seats = [
   {id: 1, name: 'A', isBooked: true},

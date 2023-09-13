@@ -3,9 +3,18 @@ import {Searchbar} from 'react-native-paper';
 import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const SearchBar = ({searchText, onChangeText, onPress, isIconVisible = true}) => {
+const SearchBar = ({searchText, onChangeText, onPressFilter,onPressHistory, isIconVisible = true}) => {
   return (
     <View style={styles.searchBarContainer}>
+      {isIconVisible && (
+        <Icon
+          name="history"
+          size={30}
+          color="white"
+          style={styles.searchBarHistoryIcon}
+          onPress={onPressHistory}
+        />
+      )}
       <Searchbar
         style={styles.searchBarInput}
         placeholder="Ara...."
@@ -21,13 +30,14 @@ const SearchBar = ({searchText, onChangeText, onPress, isIconVisible = true}) =>
           alignSelf: 'center',
         }}
       />
+
       {isIconVisible && (
         <Icon
           name="filter-plus-outline"
           size={30}
           color="white"
           style={styles.searchBarIcon}
-          onPress={onPress}
+          onPress={onPressFilter}
         />
       )}
     </View>
@@ -52,5 +62,8 @@ const styles = StyleSheet.create({
 
   searchBarIcon: {
     marginLeft: 10,
+  },
+  searchBarHistoryIcon: {
+    marginRight: 10,
   },
 });

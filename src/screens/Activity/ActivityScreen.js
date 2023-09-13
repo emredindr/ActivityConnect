@@ -152,7 +152,8 @@ const ActivityScreen = ({navigation}) => {
       <SearchBar
         searchText={searchText}
         onChangeText={text => handleSearch(text)}
-        onPress={() => setIsFilterVisible(!isFilterVisible)}
+        onPressFilter={() => setIsFilterVisible(!isFilterVisible)}
+        onPressHistory={() => navigation.navigate('ActivityHistory')}
       />
 
       {isFilterVisible && (
