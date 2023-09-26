@@ -6,7 +6,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNetInfo} from '@react-native-community/netinfo';
 import NetworkError from '../components/NetworkError/NetworkError';
-import {View} from 'react-native';
+import FavoriteStackNavigator from './FavoriteNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -43,6 +43,21 @@ const TabNavigator = () => {
           tabBarIcon: () => (
             <Icon
               name="home-group"
+              size={25}
+              color="#00B9E8"
+            />
+          ),
+          tabBarActiveTintColor: '#00B9E8',
+        }}
+      />
+      <Tab.Screen
+        name="Favorites"
+        component={FavoriteStackNavigator}
+        options={{
+          title: 'Favorilerim',
+          tabBarIcon: () => (
+            <Icon
+              name="heart"
               size={25}
               color="#00B9E8"
             />

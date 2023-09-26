@@ -1,21 +1,21 @@
-import {useState, useEffect, useCallback} from 'react';
-import {Text, View, FlatList, TextInput, TouchableOpacity, Dimensions, ScrollView, RefreshControl} from 'react-native';
+import {useState, useEffect, useCallback, useContext} from 'react';
+import {Text, View, FlatList, TextInput, TouchableOpacity, ScrollView, RefreshControl} from 'react-native';
 import activityService from '../../services/ActivityService';
 import filter from 'lodash.filter';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import venueService from '../../services/VenueService';
 import activityTypeService from '../../services/ActivityTypeService';
 import cityService from '../../services/CityService';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-
 import Loading from '../../components/Loading/Loading';
 import CustomDropdown from '../../components/Dropdown/Dropdown';
 import styles from './ActivityScreen.Style';
 import ActivityCard from '../../components/ActivityCard/ActivityCard';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import CustomCarousel from '../../components/CustomCarousel/CustomCarousel';
+import {Context as FavoriteContext} from '../../context/FavoriteContext';
 
 const ActivityScreen = ({navigation}) => {
+  const {state, addFavorite, removeFavorite} = useContext(FavoriteContext);
   const [activities, setActivities] = useState([]);
   const [allActivities, setAllActivities] = useState([]);
   const [searchParams, setSearchParams] = useState({activityTypeId: null, cityId: null, venueId: null, startDate: null, endDate: null});
@@ -128,6 +128,15 @@ const ActivityScreen = ({navigation}) => {
       return true;
     }
     return false;
+  };
+
+  const addFavoritesOrRemove = item => {
+    // if (state.length > 0 && state.find(x => x.id === item.id)) {
+    //   removeFavorite(item);
+    // } else {
+    //   addFavorite(item);
+    // }
+    addFavorite(item);
   };
 
   const clearInput = () => {
@@ -326,6 +335,7 @@ const ActivityScreen = ({navigation}) => {
                 item={item}
                 index={index}
                 onSelect={() => navigation.navigate('ActivityDetail', {activity: item})}
+                onPressFav={() => addFavoritesOrRemove(item)}
               />
             )}
           />
